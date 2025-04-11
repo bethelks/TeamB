@@ -30,8 +30,35 @@ namespace StudentGrades
             Console.WriteLine("All Students:");
             DisplayStudents(students);
 
-            // Use LINQ to filter students with grades greater than 80
-            var highAchievers = students.Where(s => s.Grade > 80);
+            //Search for a student by name
+            bool searching = true;
+            while (searching)
+            {
+                Console.WriteLine("\nEnter the name of the student to search for:");
+                string studentName = Console.ReadLine();
+                Student foundStudent = FindStudentByName(students, studentName);
+
+                if (foundStudent != null)
+                {
+                    Console.WriteLine($"\nStudent found: {foundStudent.Name}, Grade: {foundStudent.Grade}");
+                }
+                else
+                {
+                    Console.WriteLine($"\nStudent with the name '{studentName}' not found");
+                }
+
+                //Ask if the user wants to search agian
+                Console.WriteLine("Do you want to try again? (yes/no):");
+                string response = Console.ReadLine().Trim().ToLower();
+
+                if (response != "yes")
+                {
+                    searching = false; //Set searhing to false to exit the loop
+                }
+            }
+
+                // Use LINQ to filter students with grades greater than 80
+                var highAchievers = students.Where(s => s.Grade > 80);
             Console.WriteLine("\nStudents with grades greater than 80:");
             DisplayStudents(highAchievers);
 
@@ -43,6 +70,12 @@ namespace StudentGrades
             // Calculate average grade
             double averageGrade = students.Average(s => s.Grade);
             Console.WriteLine($"\nAverage grade of all students: {averageGrade}");
+
+        }
+        //Method to Seach for student by name
+        static Student FindStudentByName(List<Student> students, string name)
+        {
+            return students.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
 
         static void DisplayStudents(IEnumerable<Student> students)
