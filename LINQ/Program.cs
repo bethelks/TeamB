@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+//using System.Text.Json;
+using System.Xml.Linq;
+using Newtonsoft.Json;
 namespace StudentGrades
 {
     public class Student
@@ -18,15 +22,24 @@ namespace StudentGrades
     {
         static void Main(string[] args)
         {
-            List<Student> students = new List<Student>
+            List<Student> students = LoadStudentsFromFile("students.json") ?? new List<Student>();
+            //Console.WriteLine("All Students:");
+            //DisplayStudents(students);
+
+
+            //List<Student> students = new List<Student>
+            if (!students.Any())
             {
+                students = new List<Student>
+                {
                 new Student("Alice", 85),
                 new Student("Bob", 76),
                 new Student("Charlie", 92),
                 new Student("Diana", 88),
                 new Student("Evan", 65),
                 new Student("Fay", 95)
-            };
+                };
+            }
             Console.WriteLine("All Students:");
             DisplayStudents(students);
 
@@ -55,6 +68,15 @@ namespace StudentGrades
                 {
                     searching = false; //Set searhing to false to exit the loop
                 }
+
+                //Option to save students to a file
+                Console.WriteLine("Do you want to save the student data? (yes/no):");
+                string saveResponse = Console.ReadLine();
+                if (saveResponse?.Trim().ToLower() == "yes")
+                {
+                    SaveStudentsToFile(students, "students.json");
+                    Console.WriteLine("Student data saved to file.");
+                }
             }
 
                 // Use LINQ to filter students with grades greater than 80
@@ -72,6 +94,12 @@ namespace StudentGrades
             Console.WriteLine($"\nAverage grade of all students: {averageGrade}");
 
         }
+
+        private static string ToLower()
+        {
+            throw new NotImplementedException();
+        }
+
         //Method to Seach for student by name
         static Student FindStudentByName(List<Student> students, string name)
         {
@@ -84,6 +112,29 @@ namespace StudentGrades
             {
                 Console.WriteLine($"{student.Name}, Grade: {student.Grade}");
             }
+        }
+
+        static void SaveStudentsToFile(List<Student> students, string filePath)
+        {
+            var options = new JsonSerializerOptions { WriteIndented = true }; // Pretty print
+            string jsonString =
+                JsonConvert.SerializeObject(students, Formatting.Indented);
+            File.WriteAllText(filePath, jsonString);
+        }
+        static List<Student> LoadStudentsFromFile(string filePath)
+        {
+            if (File.Exists(filePath))
+            {
+                string jsonString = File.ReadAllText(filePath);
+                return 
+                    JsonConvert.DeserializeObject<List<Student>>(jsonString);
+            }
+            return null;
+        }
+
+        private class JsonSerializerOptions
+        {
+            public bool WriteIndented { get; set; }
         }
     }
 }
